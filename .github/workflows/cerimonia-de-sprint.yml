@@ -5,7 +5,7 @@ name: Cerimônia de sprint
 # O checklist fica em .github/cerimonia-modelo.md e pode ser editado pela turma.
 on:
   schedule:
-    - cron: '0 12 * * 1'
+    - cron: '0 12 * * 5'
   workflow_dispatch:
 
 permissions:
