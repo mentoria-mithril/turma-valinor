@@ -1,0 +1,38 @@
+name: Cerimônia de sprint
+
+# Abre a issue de Review + Retro + Planning algumas horas antes do encontro da turma.
+# O cron está em UTC. Também pode ser disparado à mão em Actions → Run workflow.
+# O checklist fica em .github/cerimonia-modelo.md e pode ser editado pela turma.
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  abrir-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Abrir a issue da cerimônia
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          titulo="Cerimônia de sprint — $(date -u +%d/%m/%Y)"
+
+          abertas=$(gh issue list --state open --limit 100 --json title --jq '.[].title')
+          if grep -qxF "$titulo" <<<"$abertas"; then
+            echo "Issue \"$titulo\" já está aberta. Nada a fazer."
+            exit 0
+          fi
+
+          gh issue create \
+            --title "$titulo" \
+            --body-file .github/cerimonia-modelo.md \
+            --assignee "douglasmeneses"
